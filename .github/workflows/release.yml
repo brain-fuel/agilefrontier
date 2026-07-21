@@ -1,0 +1,43 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cat > release-notes.md <<'EOF'
+          ## Agile Frontier v0.1.0
+
+          Dependency-aware Gantt planning powered by a Go+ WebAssembly engine.
+
+          **Run it now:** https://agilefrontier.matthew-i-laine.chatgpt.site
+
+          - Import agnostic Jira-like story JSON.
+          - Honor reciprocal `depends on` / `is depended on by` links.
+          - Prioritize the longest remaining critical paths.
+          - Show latest safe start dates and red/yellow/green deadline slack.
+          - Filter future work by N degrees from the Gantt Frontier.
+          - Reforecast by workers, points per day, estimates, teams, and assignees.
+
+          The attached WebAssembly binary is the exact Go+-generated planning
+          engine used by the deployed browser application.
+          EOF
+          gh release create "$GITHUB_REF_NAME" \
+            public/agilefrontier.wasm \
+            public/wasm_exec.js \
+            --title "Agile Frontier $GITHUB_REF_NAME" \
+            --notes-file release-notes.md \
+            --verify-tag
