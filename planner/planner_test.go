@@ -2,8 +2,30 @@ package planner
 
 import (
 	"encoding/json"
+	"strings"
 	"testing"
 )
+
+func TestApplyOptionAssignmentsConsumesParticiple(t *testing.T) {
+	base := Options{Workers: 1, PointsPerDay: 1, SprintDays: 5}
+	result := ApplyOptionAssignments("workers=6; pointsPerDay=3; sprintDays=12; frontierDepth=2", base)
+	applied, ok := result.(OptionsApplied)
+	if !ok {
+		t.Fatalf("result=%T", result)
+	}
+	if applied.Value.Workers != 6 || applied.Value.PointsPerDay != 3 || applied.Value.SprintDays != 12 || applied.Value.FrontierDepth == nil || *applied.Value.FrontierDepth != 2 {
+		t.Fatalf("options=%+v", applied.Value)
+	}
+
+	rejected, ok := ApplyOptionAssignments("workers=?", base).(InvalidOptionAssignments)
+	if !ok || !strings.Contains(rejected.Message, "expected integer") {
+		t.Fatalf("rejection=%#v", rejected)
+	}
+	unknown, ok := ApplyOptionAssignments("velocity=3", base).(InvalidOptionAssignments)
+	if !ok || !strings.Contains(unknown.Message, "unknown planning option") {
+		t.Fatalf("unknown=%#v", unknown)
+	}
+}
 
 func plan(t *testing.T, stories []Story, configure func(*Options)) Output {
 	t.Helper()

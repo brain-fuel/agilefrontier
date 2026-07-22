@@ -30,7 +30,7 @@ export const emptyResult: ScheduleResult = { scheduled: [], ignored: [], hidden:
 declare global {
   interface Window {
     Go: new () => { importObject: WebAssembly.Imports; run(instance: WebAssembly.Instance): Promise<void> };
-    agilefrontier?: { schedule(input: string): string };
+    agilefrontier?: { schedule(input: string): string; applyOptions(input: string, current: string): string };
     __agilefrontierReady?: () => void;
   }
 }
@@ -70,6 +70,13 @@ function loadScript(src: string) {
 export function scheduleStories(stories: Story[], options: SchedulerOptions): ScheduleResult {
   if (!window.agilefrontier) throw new Error("Go+ planning engine is not ready");
   const decoded = JSON.parse(window.agilefrontier.schedule(JSON.stringify({ stories, options }))) as ScheduleResult & { error?: string };
+  if (decoded.error) throw new Error(decoded.error);
+  return decoded;
+}
+
+export function applyOptionAssignments(input: string, options: SchedulerOptions): SchedulerOptions {
+  if (!window.agilefrontier) throw new Error("Go+ planning engine is not ready");
+  const decoded = JSON.parse(window.agilefrontier.applyOptions(input, JSON.stringify(options))) as SchedulerOptions & { error?: string };
   if (decoded.error) throw new Error(decoded.error);
   return decoded;
 }

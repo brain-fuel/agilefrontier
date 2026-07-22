@@ -9,11 +9,13 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"goforge.dev/participle"
 )
 
 type StoryState enum { Active(Name string); Done(); Canceled() }
 type Urgency enum { StartNow(); WatchNext(); HasRoom() }
 type PlanOutcome enum { Planned(Value Output); InvalidPlan(Message string) }
+type OptionAssignmentsOutcome enum { OptionsApplied(Value Options); InvalidOptionAssignments(Message string) }
 
 type WorkerCount refine(value int) { value > 0 && value <= 100 }
 type PointsPerDay refine(value float64) { value > 0 && value <= 1000 }
@@ -100,6 +102,43 @@ func ScheduleJSON(input string) string {
 		if err != nil { return marshalError(err.Error()) }
 		return string(body)
 	case InvalidPlan(message): return marshalError(message)
+	}
+}
+
+// ApplyOptionAssignments parses compact numeric planning overrides through
+// the grammar-indexed GoForge Participle core. The grammar/FIRST/parser
+// identities are inferred, checked across the package boundary, and erased
+// from the generated Go/WASM artifact.
+func ApplyOptionAssignments(input string, options Options) OptionAssignmentsOutcome {
+	grammar := participle.AssignmentGrammar(701)
+	first := participle.AssignmentFirst(grammar)
+	parser := participle.BuildAssignments(grammar, first)
+	result := participle.Parse[[]participle.Assignment](parser, input)
+	switch outcome := result.(type) {
+	case participle.Rejected[[]participle.Assignment]: return InvalidOptionAssignments(outcome.Failure.Error())
+	case participle.Parsed[[]participle.Assignment]:
+		assignments := outcome.Value
+		for _, assignment := range assignments {
+			value := assignment.Value
+			switch assignment.Name {
+			case "workers": if value < 1 || value > 100 { return InvalidOptionAssignments("workers must be between 1 and 100") }; options.Workers = int(value)
+			case "pointsPerDay": if value < 1 || value > 1000 { return InvalidOptionAssignments("pointsPerDay must be between 1 and 1000") }; options.PointsPerDay = float64(value)
+			case "sprintDays": if value < 1 || value > 100 { return InvalidOptionAssignments("sprintDays must be between 1 and 100") }; options.SprintDays = int(value)
+			case "frontierDepth": if value < 0 { return InvalidOptionAssignments("frontierDepth must not be negative") }; depth := int(value); options.FrontierDepth = &depth
+			default: return InvalidOptionAssignments("unknown planning option " + strconv.Quote(assignment.Name))
+			}
+		}
+		return OptionsApplied(options)
+	}
+	panic("planner: impossible participle outcome")
+}
+
+func ApplyOptionAssignmentsJSON(input string, current string) string {
+	var options Options
+	if err := json.Unmarshal([]byte(current), &options); err != nil { return marshalError("decode options: " + err.Error()) }
+	match ApplyOptionAssignments(input, options) {
+	case InvalidOptionAssignments(message): return marshalError(message)
+	case OptionsApplied(value): body, err := json.Marshal(value); if err != nil { return marshalError(err.Error()) }; return string(body)
 	}
 }
 
