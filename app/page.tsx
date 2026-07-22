@@ -13,7 +13,7 @@ import {
   type Story,
 } from "../lib/scheduler";
 
-const storageKey = "agilefrontier:v0.2.0";
+const storageKey = "agilefrontier:v0.2.1";
 
 type SavedState = { stories: Story[]; options: SchedulerOptions };
 
@@ -135,7 +135,7 @@ export default function Home() {
       <header className="topbar">
         <div className="brand-lockup">
           <span className="brand-mark" aria-hidden="true"><i /><i /><i /></span>
-          <div><strong>Agile Frontier</strong><span>v0.2.0</span></div>
+          <div><strong>Agile Frontier</strong><span>v0.2.1</span></div>
         </div>
         <nav aria-label="Application actions">
           <button className="button subtle" onClick={() => fileInput.current?.click()}>Import JSON</button>
@@ -226,7 +226,7 @@ export default function Home() {
 
       {showSettings && <Modal title="Planning assumptions" eyebrow="Capacity model" onClose={() => setShowSettings(false)}><div className="settings-grid"><label><span>Plan start</span><input type="date" value={options.startDate} onChange={(event) => updateOption("startDate", event.target.value)} /></label><label><span>Target deadline</span><input type="date" value={options.deadlineDate} onChange={(event) => updateOption("deadlineDate", event.target.value)} /></label><label><span>Working days / sprint</span><input type="number" min="1" value={options.sprintDays} onChange={(event) => updateOption("sprintDays", Number(event.target.value))} /></label><label><span>Depends-on label</span><input value={options.dependsOnLabel} onChange={(event) => updateOption("dependsOnLabel", event.target.value)} /></label><label><span>Reverse label</span><input value={options.dependedOnByLabel} onChange={(event) => updateOption("dependedOnByLabel", event.target.value)} /></label></div><label><span>Compact numeric overrides</span><input value={optionAssignments} onChange={(event) => setOptionAssignments(event.target.value)} placeholder="workers=4; pointsPerDay=2; sprintDays=10" /></label>{optionAssignmentError && <p className="field-error">{optionAssignmentError}</p>}<div className="modal-actions"><button className="button subtle" onClick={applyCompactOptions}>Apply compact overrides</button><button className="button subtle" onClick={() => { setStories(sampleStories); setJson(JSON.stringify(sampleStories, null, 2)); setOptions(defaultOptions); }}>Reset all</button><button className="button primary" onClick={() => setShowSettings(false)}>Use assumptions</button></div></Modal>}
 
-      <footer><span>Agile Frontier v0.2.0</span><span>Plans stay in this browser until you export them.</span></footer>
+      <footer><span>Agile Frontier v0.2.1</span><span>Plans stay in this browser until you export them.</span></footer>
     </main>
   );
 }
