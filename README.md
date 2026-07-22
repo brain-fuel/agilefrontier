@@ -67,7 +67,7 @@ npm run dev
 ```
 
 The tests execute both the native Go+ engine and the exact shipped WebAssembly
-binary. Release version: **v0.2.1**.
+binary. Release version: **v0.2.2**.
 
 The planning-settings dialog also accepts compact numeric assignments such as
 `workers=6; pointsPerDay=3; sprintDays=12`. They are parsed inside the Go+/WASM

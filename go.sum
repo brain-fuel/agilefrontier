@@ -1,4 +1,4 @@
 github.com/alecthomas/participle/v2 v2.1.4 h1:W/H79S8Sat/krZ3el6sQMvMaahJ+XcM9WSI2naI7w2U=
 github.com/alecthomas/participle/v2 v2.1.4/go.mod h1:8tqVbpTX20Ru4NfYQgZf4mP18eXPTBViyMWiArNEgGI=
-goforge.dev/participle v0.1.1 h1:0Mtsp0z1evKZ0Le+RD4zdZpBAuNEw9f0cwPn0jF55kY=
-goforge.dev/participle v0.1.1/go.mod h1:JKtj/FRQWjSyuT1z1iqfcX3PFxChUhOT1P5O0sPCaUU=
+goforge.dev/participle v0.1.2 h1:Tj+9mJ8YTPZ/3u91wGzT1wBPmAMMvn3mrEaCT+fEtjs=
+goforge.dev/participle v0.1.2/go.mod h1:JKtj/FRQWjSyuT1z1iqfcX3PFxChUhOT1P5O0sPCaUU=
